@@ -80,6 +80,8 @@ void signupwindow::on_pushButton_2_clicked()
     srand(time(NULL));
     int salt = rand();
     salt = rand();
+    int flag_200 = 2;
+    flag_200 = check_qstring(ttt,flag_200);
     QString str_salt = QString::number(salt);
     QString hht = ttt + str_salt;
     char* h_t = hht.toLocal8Bit().data();
@@ -92,6 +94,10 @@ void signupwindow::on_pushButton_2_clicked()
         ui->label_4->setText("Check ID");
     } else if (tt != dt) {
         ui->label_4->setText("Check ID");
+    } else if (flag_200 == 3) {
+        ui->label_5->setText("Type PW");
+    } else if (flag_200 == 1) {
+        ui->label_5->setText("PW must Eng or Num");
     } else if (ttt == ttt_c) {
         QSqlQuery query;
         QString qt = QString("INSERT INTO User_Info VALUES('%1', '%2', %3, 0);").arg(tt,hash,str_salt);
