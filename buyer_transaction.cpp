@@ -1,7 +1,6 @@
 #include "buyer_transaction.h"
 #include "ui_buyer_transaction.h"
 #include <QSqlQueryModel>
-#include <QDebug>
 #include <QSqlRecord>
 #include <QString>
 #include <QMessageBox>

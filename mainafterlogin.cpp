@@ -4,6 +4,7 @@
 #include "transaction.h"
 #include "mainwindow.h"
 #include <QtSql/QSqlQuery>
+#include <QDebug>
 
 mainafterlogin::mainafterlogin(QString user_id, QWidget *parent) :
     QDialog(parent),
@@ -53,7 +54,7 @@ void mainafterlogin::on_pushButton_2_clicked()
 
     query.exec(sql_q);
     transaction transaction(user_id, this);
-    transaction.setModal(true); //modal approach여서 해당 버튼으로 열리는 새창이 꺼져야 기존 창을 사용가능
+    transaction.setModal(true); //modal approach
     transaction.exec();
 }
 

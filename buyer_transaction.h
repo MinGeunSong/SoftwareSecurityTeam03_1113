@@ -7,7 +7,6 @@
 #include <QMessageBox>
 #include <QSqlRecord>
 #include <QSqlQuery>
-#include <QDebug>
 
 namespace Ui {
 class buyer_transaction;

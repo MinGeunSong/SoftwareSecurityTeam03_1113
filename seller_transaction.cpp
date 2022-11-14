@@ -1,6 +1,7 @@
 #include "seller_transaction.h"
 #include "ui_seller_transaction.h"
 #include <QMessageBox>
+#include <QDebug>
 
 seller_transaction::seller_transaction(QWidget *parent) :
     QDialog(parent),
@@ -12,7 +13,6 @@ seller_transaction::seller_transaction(QWidget *parent) :
 seller_transaction::~seller_transaction()
 {
     delete ui;
-    ui->d_num_edit->setInputMask("0000000000");
 }
 
 void seller_transaction::on_pushButton_clicked()

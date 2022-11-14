@@ -7,7 +7,6 @@
 #include <QMessageBox>
 #include <QSqlRecord>
 #include <QSqlQuery>
-#include <QDebug>
 #include <unistd.h>
 
 namespace Ui {
@@ -90,7 +89,6 @@ private:
         QString sql = "UPDATE TRANSACTION_INFO SET STATUS='"+this->t.status+
                         "', ADDRESS='"+this->t.address+"', DELIVERY='"+this->t.delivery+"', D_NUM='"+this->t.d_num+
                         "', BROKER='"+this->t.broker+"' WHERE ID='"+this->t.id+"' ;";
-        qDebug() << sql;
         query.exec(sql);
     }
     void set_rn(){

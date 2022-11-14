@@ -134,6 +134,7 @@ void transaction::on_pushButton_3_clicked()
         ui->tableWidget_2->setItem(i, 3, new QTableWidgetItem(price));
         ui->tableWidget_2->setItem(i, 4, new QTableWidgetItem(buyer));
     }
+    after_request();
 }
 
 void transaction::on_tableWidget_doubleClicked(const QModelIndex &index)
@@ -332,14 +333,17 @@ void transaction::on_tableWidget_2_doubleClicked(const QModelIndex &index)
             reply3 = QMessageBox::question(this, "Delivery Check", info, QMessageBox::Yes|QMessageBox::No);
             if (reply3 == QMessageBox::Yes){
                     seller_transaction * sptr;
-                    seller_transaction seller_transaction;
+                    seller_transaction seller_transaction(this);
                     sptr = &seller_transaction;
                     seller_transaction.setModal(true);
                     connect(sptr, SIGNAL(delivery_done(QString, QString)), this, SLOT(delivery_done(QString,QString)));
                     seller_transaction.exec();
+                    break;
                 }
-            break;
+            else{
+                break;
             }
+        }
         case DELIVERY:{
         }
         case VERIFY:{
