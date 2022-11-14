@@ -4,7 +4,6 @@
 #include "transaction.h"
 #include "mainwindow.h"
 #include <QtSql/QSqlQuery>
-#include <QDebug>
 
 mainafterlogin::mainafterlogin(QString user_id, QWidget *parent) :
     QDialog(parent),

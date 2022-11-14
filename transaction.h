@@ -51,6 +51,7 @@ private slots:
     void on_buyer_id_received(QString web_id);
     void on_sale_id_received(QString sale_id);
     void on_seller_id_received(QString seller_id, QString price, QString product, QString wid);
+    void on_my_id_received(QString my_id);
 
 signals:
     void request_success();
@@ -63,6 +64,7 @@ private:
     QString user_id;
     QString tid;
     QString rn;
+    QString my_id;
     Transaction t;
     Transaction temp;
     void load_transaction_info(){

@@ -1,7 +1,6 @@
 #include "seller_transaction.h"
 #include "ui_seller_transaction.h"
 #include <QMessageBox>
-#include <QDebug>
 
 seller_transaction::seller_transaction(QWidget *parent) :
     QDialog(parent),

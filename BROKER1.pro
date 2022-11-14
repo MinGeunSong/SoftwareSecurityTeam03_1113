@@ -21,7 +21,8 @@ SOURCES += \
     transaction.cpp \
     request.cpp \
     buyer_transaction.cpp \
-    seller_transaction.cpp
+    seller_transaction.cpp \
+    secondhand_id.cpp
 
 HEADERS += \
     deposit.h \
@@ -31,7 +32,8 @@ HEADERS += \
     transaction.h \
     request.h \
     buyer_transaction.h \
-    seller_transaction.h
+    seller_transaction.h \
+    secondhand_id.h
 
 FORMS += \
     deposit.ui \
@@ -41,7 +43,8 @@ FORMS += \
     transaction.ui \
     request.ui \
     buyer_transaction.ui \
-    seller_transaction.ui
+    seller_transaction.ui \
+    secondhand_id.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

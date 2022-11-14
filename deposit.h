@@ -4,7 +4,6 @@
 #include <QDialog>
 #include <QString>
 #include <QtSql>
-#include <QtDebug>
 #include <QFileInfo>
 
 

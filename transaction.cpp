@@ -1,7 +1,6 @@
 #include "transaction.h"
 #include "ui_transaction.h"
 #include <QSqlQueryModel>
-#include <QDebug>
 #include <QSqlRecord>
 #include "request.h"
 #include <QModelIndex>
@@ -15,6 +14,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonValue>
+#include "secondhand_id.h"
 
 #define REQUEST 1
 #define INITIATION 2
@@ -373,6 +373,14 @@ void transaction::on_tableWidget_2_doubleClicked(const QModelIndex &index)
 
 void transaction::on_pushButton_2_clicked()
 {
+    //0. Valid Web ID Check
+    secondhand_ID * ptr;
+    secondhand_ID s_ID(this);
+    ptr = &s_ID;
+    s_ID.setModal(true);
+    connect(ptr, SIGNAL(my_id_sig(QString)), this, SLOT(on_my_id_received(QString)));
+    s_ID.exec();
+
     //1. make request
     QNetworkAccessManager *mgr = new QNetworkAccessManager();
     const QUrl url("http://3.36.207.92/common/user/");//url
@@ -394,11 +402,17 @@ void transaction::on_pushButton_2_clicked()
 
             foreach (const QJsonValue &value, json_array){
                 QJsonObject json_obj = value.toObject();
+                QString web_id = json_obj["username"].toString();
                 QString compare = json_obj["broker_id"].toString();
                 if (compare == user_id){
-                    QString buyer_id_on_web = QString::number(json_obj["id"].toInt());
-                    connect(this, SIGNAL(buyer_id_received(QString)), this, SLOT(on_buyer_id_received(QString)));
-                    emit buyer_id_received(buyer_id_on_web);
+                    if (web_id != this->my_id){
+                        QString info = "Your ID is not registered in the Website.";
+                        QMessageBox::warning(this, "Invalid ID", info);
+                    }else{
+                        QString buyer_id_on_web = QString::number(json_obj["id"].toInt());
+                        connect(this, SIGNAL(buyer_id_received(QString)), this, SLOT(on_buyer_id_received(QString)));
+                        emit buyer_id_received(buyer_id_on_web);
+                    }
                 }
             }
         }
@@ -526,4 +540,8 @@ void transaction::on_seller_id_received(QString seller_id, QString price, QStrin
         }
         reply->deleteLater();
     });
+}
+
+void transaction::on_my_id_received(QString my_id){
+    this->my_id = my_id;
 }
