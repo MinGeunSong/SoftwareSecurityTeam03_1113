@@ -62,16 +62,21 @@ void deposit::on_pushButton_clicked()
             {
                 originalbal = qry1.value(0).toInt();
             }
-            //original bal has the updated balance value
-            originalbal = originalbal + (baltype * intmoney);
-            //update the new balance value to the DB
-            QSqlQuery qry;
-            qry.prepare("UPDATE user_info SET balance = '"+ QString::number(originalbal) +"' where id='" + user_id + "'");
-            if (!qry.exec())
-            {
-                QMessageBox::information(this, "Title", "Could not update the DB");
+            int check = __INT_MAX__ - originalbal;
+            if(check > baltype * intmoney){
+                //original bal has the updated balance value
+                originalbal = originalbal + (baltype * intmoney);
+                //update the new balance value to the DB
+                QSqlQuery qry;
+                qry.prepare("UPDATE user_info SET balance = '"+ QString::number(originalbal) +"' where id='" + user_id + "'");
+                if (!qry.exec())
+                {
+                    QMessageBox::information(this, "Title", "Could not update the DB");
+                }
+                QMessageBox::information(this, "Title", money +" won has been deposited");
+            }else{
+                QMessageBox::warning(this, "Deposit Limit Warning", "You cannot have balance over " + QString::number(__INT_MAX__));
             }
-            QMessageBox::information(this, "Title", money +" won has been deposited");
         }
 
     }
