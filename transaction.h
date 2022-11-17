@@ -8,6 +8,7 @@
 #include <QSqlRecord>
 #include <QSqlQuery>
 #include <unistd.h>
+#include <QSqlDatabase>
 
 namespace Ui {
 class transaction;
@@ -61,6 +62,7 @@ signals:
 
 private:
     Ui::transaction *ui;
+    QSqlDatabase mydb;
     QString user_id;
     QString tid;
     QString rn;
