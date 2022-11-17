@@ -16,7 +16,6 @@
 #include <QJsonValue>
 #include "secondhand_id.h"
 #include <QSqlDatabase>
-#include <QDebug>
 
 #define REQUEST 1
 #define INITIATION 2
@@ -37,17 +36,17 @@ transaction::transaction(QString user_id, QWidget *parent) :
     set_uid(user_id);
     mydb = QSqlDatabase::database("qt_sql_default_connection");
     //load model for buy data
-    QSqlQueryModel model;
-
-
-    model.setQuery("SELECT * FROM TRANSACTION_INFO WHERE BUYER='"+user_id+"'");
-
-    for (int i = 0; i < model.rowCount(); ++i){
-        QString tid = model.record(i).value("ID").toString();
-        QString status = model.record(i).value("STATUS").toString();
-        QString product = model.record(i).value("PRODUCT").toString();
-        QString price = model.record(i).value("PRICE").toString();
-        QString seller = model.record(i).value("SELLER").toString();
+    QSqlQuery qry1;
+    QSqlQuery qry2;
+    qry1.prepare("SELECT ID, STATUS, PRODUCT, PRICE, SELLER FROM TRANSACTION_INFO WHERE BUYER= :id");
+    qry1.bindValue(":id", user_id);
+    qry1.exec();
+    while(qry1.next()){
+        QString tid = qry1.value(0).toString();
+        QString status = qry1.value(1).toString();
+        QString product =  qry1.value(2).toString();
+        QString price =  qry1.value(3).toString();
+        QString seller =  qry1.value(4).toString();
 
         ui->tableWidget->insertRow(ui->tableWidget->rowCount());
         ui->tableWidget->setItem(ui->tableWidget->rowCount()-1, 0, new QTableWidgetItem(tid));
@@ -58,14 +57,15 @@ transaction::transaction(QString user_id, QWidget *parent) :
     }
 
     //load model for sell data
-    model.setQuery("SELECT * FROM TRANSACTION_INFO WHERE SELLER='"+user_id+"'");
-
-    for (int i = 0; i < model.rowCount(); ++i){
-        QString tid = model.record(i).value("ID").toString();
-        QString status = model.record(i).value("STATUS").toString();
-        QString product = model.record(i).value("PRODUCT").toString();
-        QString price = model.record(i).value("PRICE").toString();
-        QString buyer = model.record(i).value("BUYER").toString();
+    qry2.prepare("SELECT ID, STATUS, PRODUCT, PRICE, BUYER FROM TRANSACTION_INFO WHERE SELLER= :id");
+    qry2.bindValue(":id", user_id);
+    qry2.exec();
+    while(qry2.next()){
+        QString tid = qry2.value(0).toString();
+        QString status = qry2.value(1).toString();
+        QString product =  qry2.value(2).toString();
+        QString price =  qry2.value(3).toString();
+        QString buyer =  qry2.value(4).toString();
 
         ui->tableWidget_2->insertRow(ui->tableWidget_2->rowCount());
         ui->tableWidget_2->setItem(ui->tableWidget_2->rowCount()-1, 0, new QTableWidgetItem(tid));
@@ -93,17 +93,17 @@ void transaction::on_pushButton_clicked()
 
 void transaction::after_request(){
     //load model for buy data
-    QSqlQueryModel model;
-
-    model.setQuery("SELECT * FROM TRANSACTION_INFO WHERE BUYER='"+user_id+"'");
-
-    int end = model.rowCount();
-    for (int i = 0; i < end; ++i){
-        QString tid = model.record(i).value("ID").toString();
-        QString status = model.record(i).value("STATUS").toString();
-        QString product = model.record(i).value("PRODUCT").toString();
-        QString price = model.record(i).value("PRICE").toString();
-        QString seller = model.record(i).value("SELLER").toString();
+    QSqlQuery qry1;
+    qry1.prepare("SELECT ID, STATUS, PRODUCT, PRICE, SELLER FROM TRANSACTION_INFO WHERE BUYER= :id");
+    qry1.bindValue(":id", user_id);
+    qry1.exec();
+    int i = 0;
+    while(qry1.next()){
+        QString tid = qry1.value(0).toString();
+        QString status = qry1.value(1).toString();
+        QString product =  qry1.value(2).toString();
+        QString price =  qry1.value(3).toString();
+        QString seller =  qry1.value(4).toString();
 
         if(i==ui->tableWidget->rowCount()){
             ui->tableWidget->insertRow(ui->tableWidget->rowCount());
@@ -113,22 +113,25 @@ void transaction::after_request(){
         ui->tableWidget->setItem(i, 2, new QTableWidgetItem(product));
         ui->tableWidget->setItem(i, 3, new QTableWidgetItem(price));
         ui->tableWidget->setItem(i, 4, new QTableWidgetItem(seller));
+        ++i;
     }
 }
 
 void transaction::on_pushButton_3_clicked()
 {
-    QSqlQueryModel model;
+    QSqlQuery qry2;
+    qry2.prepare("SELECT ID, STATUS, PRODUCT, PRICE, BUYER FROM TRANSACTION_INFO WHERE SELLER= :id");
+    qry2.bindValue(":id", user_id);
+    qry2.exec();
+    int i = 0;
 
-    model.setQuery("SELECT * FROM TRANSACTION_INFO WHERE SELLER='"+user_id+"'");
-    int end = model.rowCount();
+    while(qry2.next()){
+        QString tid = qry2.value(0).toString();
+        QString status = qry2.value(1).toString();
+        QString product =  qry2.value(2).toString();
+        QString price =  qry2.value(3).toString();
+        QString buyer =  qry2.value(4).toString();
 
-    for (int i = 0; i < end; ++i){
-        QString tid = model.record(i).value("ID").toString();
-        QString status = model.record(i).value("STATUS").toString();
-        QString product = model.record(i).value("PRODUCT").toString();
-        QString price = model.record(i).value("PRICE").toString();
-        QString buyer = model.record(i).value("BUYER").toString();
         if(i==ui->tableWidget_2->rowCount()){
             ui->tableWidget_2->insertRow(ui->tableWidget_2->rowCount());
         }
@@ -137,6 +140,7 @@ void transaction::on_pushButton_3_clicked()
         ui->tableWidget_2->setItem(i, 2, new QTableWidgetItem(product));
         ui->tableWidget_2->setItem(i, 3, new QTableWidgetItem(price));
         ui->tableWidget_2->setItem(i, 4, new QTableWidgetItem(buyer));
+        ++i;
     }
     after_request();
 }
