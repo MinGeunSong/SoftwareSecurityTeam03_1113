@@ -19,8 +19,7 @@ deposit::deposit(QString user_id, QWidget *parent) :
     ui->lineEdit->setValidator(roll);
 
     //SQL
-    QSqlDatabase mydb = QSqlDatabase::addDatabase("QSQLITE");
-    mydb.setDatabaseName("test.db");
+    mydb = QSqlDatabase::database("qt_sql_default_connection");
 
     if(!mydb.open())
         ui->label->setText("Failed to open the database");
@@ -37,15 +36,10 @@ deposit::~deposit()
 
 void deposit::on_pushButton_clicked()
 {
-    QString money = ui->lineEdit->text(); // money에 input bal saved
-    int intmoney = money.toInt(); //Int type change
-    //QMessageBox::information(this, "Title", money +" won has been deposited/withdrawed");
-
-
-    if (ui->checkBox->isChecked() == true)
-    {
-        int baltype = 1;
-
+    QString info;
+    if(mydb.transaction()){
+        QString money = ui->lineEdit->text(); // money에 input bal saved
+        int intmoney = money.toInt(); //Int type change
         //read balance data
         QSqlQuery qry1;
         qry1.prepare("SELECT balance from user_info where id='" + user_id + "'");
@@ -63,9 +57,9 @@ void deposit::on_pushButton_clicked()
                 originalbal = qry1.value(0).toInt();
             }
             int check = __INT_MAX__ - originalbal;
-            if(check > baltype * intmoney){
+            if(check > intmoney){
                 //original bal has the updated balance value
-                originalbal = originalbal + (baltype * intmoney);
+                originalbal = originalbal + intmoney;
                 //update the new balance value to the DB
                 QSqlQuery qry;
                 qry.prepare("UPDATE user_info SET balance = '"+ QString::number(originalbal) +"' where id='" + user_id + "'");
@@ -78,11 +72,23 @@ void deposit::on_pushButton_clicked()
                 QMessageBox::warning(this, "Deposit Limit Warning", "You cannot have balance over " + QString::number(__INT_MAX__));
             }
         }
-
+        if(!mydb.commit()){
+            info = "DB Transaction commit failed, Rollback Occurs.";
+            QMessageBox::warning(this, "Rollback", info);
+            mydb.rollback();
+        }
+    }else{
+        info = "Failed to Start DB Transaction Mode";
+        QMessageBox::warning(this, "DB Transaction Mode Enter Failure.", info);
     }
-    else
-    {
-        int baltype = -1;
+}
+
+void deposit::on_pushButton_2_clicked()
+{
+    QString info;
+    if(mydb.transaction()){
+        QString money = ui->lineEdit->text(); // money에 input bal saved
+        int intmoney = money.toInt(); //Int type change
         //read balance data
         QSqlQuery qry1;
         qry1.prepare("SELECT balance from user_info where id='" + user_id + "'");
@@ -100,10 +106,10 @@ void deposit::on_pushButton_clicked()
                 originalbal = qry1.value(0).toInt();
             }
             //original bal has the updated balance value
-            originalbal = originalbal + (baltype * intmoney);
+            originalbal = originalbal - intmoney;
             if (originalbal < 0)
             {
-                QMessageBox::information(this, "Title", "You have no enough balance to withdraw");
+                QMessageBox::information(this, "Title", "You do not have enough balance to withdraw");
             }
             else
             {
@@ -116,17 +122,14 @@ void deposit::on_pushButton_clicked()
                 }
                 QMessageBox::information(this, "Title", money +" won has been withdrawed");
             }
+            if(!mydb.commit()){
+                info = "DB Transaction commit failed, Rollback Occurs.";
+                QMessageBox::warning(this, "Rollback", info);
+                mydb.rollback();
+            }
         }
+    }else{
+        info = "Failed to Start DB Transaction Mode";
+        QMessageBox::warning(this, "DB Transaction Mode Enter Failure.", info);
     }
-
 }
-
-
-
-
-void deposit::on_checkBox_stateChanged(int arg1)
-{
-
-}
-
-
