@@ -47,9 +47,6 @@ void MainWindow::on_pushButton_2_clicked()
     user_id = ui->lineEdit_id->text();
     user_pw = ui->lineEdit_pw->text();
 
-    char buffer[300];
-    sprintf(buffer, "%s", (const char*)user_id.toStdString().c_str());
-
     mydb = QSqlDatabase::addDatabase("QSQLITE");
     mydb.setDatabaseName("test.db");
 
