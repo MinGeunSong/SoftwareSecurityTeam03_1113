@@ -43,7 +43,7 @@ void signupwindow::on_pushButton_clicked()
     QSqlQuery query;
     int flag_100 = 2;
     flag_100 = check_qstring(tt,flag_100);
-    query.exec("CREATE TABLE IF NOT EXISTS User_info(id TEXT, userpw text, salt int, balance int) ;");
+    query.exec("CREATE TABLE IF NOT EXISTS User_info(id TEXT primary key, userpw text, salt int, balance int) ;");
     QString ttt = QString("select * from user_info where id == '%1';").arg(tt);
     query.exec(ttt);
     QString id = QString();
