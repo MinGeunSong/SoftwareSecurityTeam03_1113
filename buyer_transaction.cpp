@@ -24,10 +24,8 @@ buyer_transaction::~buyer_transaction()
 void buyer_transaction::on_submit_address_clicked()
 {
     QString address = ui->address_edit->text();
-    char address_input[300];
 
     if (address.length() > 0){
-        sprintf(address_input, "%s", (const char*)address.toStdString().c_str());
         emit done(address);
         this->close();
     }
