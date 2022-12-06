@@ -410,7 +410,7 @@ void transaction::on_pushButton_2_clicked()
 
     //1. make request
     QNetworkAccessManager *mgr = new QNetworkAccessManager();
-    const QUrl url("http://3.36.207.92/common/user/");//url
+    const QUrl url(QString("http://3.36.207.92/common/user/?username=%1").arg(this->my_id));//url
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     
@@ -431,17 +431,16 @@ void transaction::on_pushButton_2_clicked()
                 QJsonObject json_obj = value.toObject();
                 QString web_id = json_obj["username"].toString();
                 QString compare = json_obj["broker_id"].toString();
-                if (compare == user_id){
-                    if (web_id != this->my_id){
-                        QString info = "Your ID is not registered in the Website.";
-                        QMessageBox::warning(this, "Invalid ID", info);
-                    }else{
-                        QString buyer_id_on_web = QString::number(json_obj["id"].toInt());
-                        connect(this, SIGNAL(buyer_id_received(QString)), this, SLOT(on_buyer_id_received(QString)));
-                        emit buyer_id_received(buyer_id_on_web);
-                    }
+
+                if (web_id == this->my_id && compare == user_id){
+                    QString buyer_id_on_web = QString::number(json_obj["id"].toInt());
+                    connect(this, SIGNAL(buyer_id_received(QString)), this, SLOT(on_buyer_id_received(QString)));
+                    emit buyer_id_received(buyer_id_on_web);
+                }else{
+                    QString info = "Your ID is not registered in the Website.";
+                    QMessageBox::warning(this, "Invalid ID", info);
                 }
-            }
+               }
         }
         else{
             QString err = reply->errorString();
@@ -453,7 +452,7 @@ void transaction::on_pushButton_2_clicked()
 void transaction::on_buyer_id_received(QString web_id){
     //1. make request
     QNetworkAccessManager *mgr = new QNetworkAccessManager();
-    const QUrl url("http://3.36.207.92/board/api/bid_api/");//url
+    const QUrl url(QString("http://3.36.207.92/board/api/bid_api/?buyer_id=%1&agreed=1").arg(web_id));//url
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
@@ -471,13 +470,9 @@ void transaction::on_buyer_id_received(QString web_id){
 
             foreach (const QJsonValue &value, json_array){
                 QJsonObject json_obj = value.toObject();
-                QString compare = QString::number(json_obj["buyer_id"].toInt());
-                int sold = json_obj["agreed"].toInt();
-                if (compare == web_id && sold == 1){
-                    QString sale_id_on_web = QString::number(json_obj["sale_id"].toInt());
-                    connect(this, SIGNAL(sale_id_received(QString)), this, SLOT(on_sale_id_received(QString)));
-                    emit sale_id_received(sale_id_on_web);
-                }
+                QString sale_id_on_web = QString::number(json_obj["sale_id"].toInt());
+                connect(this, SIGNAL(sale_id_received(QString)), this, SLOT(on_sale_id_received(QString)));
+                emit sale_id_received(sale_id_on_web);
             }
         }
         else{
@@ -491,7 +486,7 @@ void transaction::on_buyer_id_received(QString web_id){
 void transaction::on_sale_id_received(QString sale_id_on_web){
     //1. make request
     QNetworkAccessManager *mgr = new QNetworkAccessManager();
-    const QUrl url("http://3.36.207.92/board/api/sale_api/");//url
+    const QUrl url(QString("http://3.36.207.92/board/api/sale_api/?id=%1").arg(sale_id_on_web));//url
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
@@ -510,14 +505,11 @@ void transaction::on_sale_id_received(QString sale_id_on_web){
 
             foreach (const QJsonValue &value, json_array){
                 QJsonObject json_obj = value.toObject();
-                QString compare = QString::number(json_obj["id"].toInt());
-                if (compare == sale_id_on_web){
-                    QString price = QString::number(json_obj["price"].toInt());
-                    QString product = json_obj["product"].toString();
-                    QString seller_id = QString::number(json_obj["seller_id"].toInt());
-                    connect(this, SIGNAL(seller_id_received(QString, QString, QString, QString)), this, SLOT(on_seller_id_received(QString, QString, QString, QString)));
-                    emit seller_id_received(seller_id, price, product, sale_id_on_web);
-                }
+                QString price = QString::number(json_obj["price"].toInt());
+                QString product = json_obj["product"].toString();
+                QString seller_id = QString::number(json_obj["seller_id"].toInt());
+                connect(this, SIGNAL(seller_id_received(QString, QString, QString, QString)), this, SLOT(on_seller_id_received(QString, QString, QString, QString)));
+                emit seller_id_received(seller_id, price, product, sale_id_on_web);
             }
         }
         else{
@@ -530,7 +522,7 @@ void transaction::on_sale_id_received(QString sale_id_on_web){
 void transaction::on_seller_id_received(QString seller_id, QString price, QString product, QString wid){
     //1. make request
     QNetworkAccessManager *mgr = new QNetworkAccessManager();
-    const QUrl url("http://3.36.207.92/common/user/");//url
+    const QUrl url(QString("http://3.36.207.92/common/user/?id=%1").arg(seller_id));//url
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
@@ -549,17 +541,15 @@ void transaction::on_seller_id_received(QString seller_id, QString price, QStrin
 
             foreach (const QJsonValue &value, json_array){
                 QJsonObject json_obj = value.toObject();
-                QString compare = QString::number(json_obj["id"].toInt());
-                if (compare == seller_id){
-                    QString seller = json_obj["broker_id"].toString();
-                    this->temp.buyer = user_id;
-                    this->temp.price = price;
-                    this->temp.product = product;
-                    this->temp.webtid = wid;
-                    this->temp.seller = seller;
-                    insert_transaction();
-                    after_request();
-                }
+                QString seller = json_obj["broker_id"].toString();
+                this->temp.buyer = user_id;
+                this->temp.price = price;
+                this->temp.product = product;
+                this->temp.webtid = wid;
+                this->temp.seller = seller;
+                insert_transaction();
+                after_request();
+
             }
         }
         else{
