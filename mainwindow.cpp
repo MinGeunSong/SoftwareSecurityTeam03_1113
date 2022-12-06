@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <cstdio>
 #include <string>
+#include <cstring>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -46,6 +47,18 @@ void MainWindow::on_pushButton_2_clicked()
     QString user_pw,user_id;
     user_id = ui->lineEdit_id->text();
     user_pw = ui->lineEdit_pw->text();
+    QString verf = "\"`,./\\!@#$%^&*()_-+=";
+
+    char flag = 0;
+
+    for (int i=0; i<verf.length(); i++){
+        if (user_id.contains(verf[i])){
+            QMessageBox msgBox;
+            msgBox.setText("Warning: ID has special character!!");
+            msgBox.exec();
+            exit(EXIT_FAILURE);
+        }
+    }
 
     mydb = QSqlDatabase::addDatabase("QSQLITE");
     mydb.setDatabaseName("test.db");
@@ -74,6 +87,7 @@ void MainWindow::on_pushButton_2_clicked()
     QByteArray hash_pw(hash_pw_tmp);
     user_pw = QString(QCryptographicHash::hash((hash_pw),QCryptographicHash::Sha3_256).toHex());
     QString qry_str = "select * from user_info where id='"+user_id+"'and userpw='"+user_pw+"'";
+
     if(qry.exec(qry_str))
     {
         int count = 0;
